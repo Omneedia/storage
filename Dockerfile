@@ -2,14 +2,14 @@ FROM node:18-alpine
 RUN apk add --no-cache g++ make python3
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --production
+RUN yarn
 
 FROM node:18-alpine
 RUN apk add --no-cache g++ make python3
 WORKDIR /app
 COPY . .
-RUN npm ci
-RUN npm run build
+RUN yarn
+RUN yarn build
 
 FROM node:18-alpine
 RUN npm install -g pm2
