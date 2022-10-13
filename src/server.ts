@@ -41,7 +41,7 @@ const exposeDocs = true
 
   app.listen(
     {
-      port: 5000,
+      port: 5555,
       host: '0.0.0.0',
     },
     (err, address) => {

@@ -35,8 +35,8 @@ export class FileBackend implements GenericStorageBackend {
     const file = path.resolve(this.filePath, `${bucketName}/${key}`)
     const body = await fs.readFile(file)
     const data = await fs.stat(file)
-    const cacheControl = ''
-    const contentType = ''
+    const cacheControl = await this.getMetadata(file, 'user.supabase.cache-control')
+    const contentType = await this.getMetadata(file, 'user.supabase.content-type')
     const lastModified = new Date(0)
     lastModified.setUTCMilliseconds(data.mtimeMs)
     return {
@@ -84,7 +84,13 @@ export class FileBackend implements GenericStorageBackend {
   async copyObject(bucket: string, source: string, destination: string): Promise<ObjectMetadata> {
     const srcFile = path.resolve(this.filePath, `${bucket}/${source}`)
     const destFile = path.resolve(this.filePath, `${bucket}/${destination}`)
+    const cacheControl = await this.getMetadata(srcFile, 'user.supabase.cache-control')
+    const contentType = await this.getMetadata(srcFile, 'user.supabase.content-type')
     await fs.copyFile(srcFile, destFile)
+    await Promise.all([
+      this.setMetadata(destFile, 'user.supabase.content-type', contentType),
+      this.setMetadata(destFile, 'user.supabase.cache-control', cacheControl),
+    ])
     return {
       httpStatusCode: 200,
     }
